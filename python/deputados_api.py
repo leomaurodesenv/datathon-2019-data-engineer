@@ -1,9 +1,12 @@
 import requests
 import json
+import s3_handler
 
-# documentation
+
+# Documentation
 ##  https://dadosabertos.camara.leg.br/swagger/api.html
 urlApi = 'https://dadosabertos.camara.leg.br/api/v2/deputados'
+
 
 def getDetailsPerson(id):
     url = '%s/%s' % (urlApi, id)
@@ -11,7 +14,9 @@ def getDetailsPerson(id):
     # success ?
     if response.status_code == 200:
         obj = json.loads(response.text)
-        print(obj)
+        return obj
+    return {}
+
 
 def getAllPersons():
     '''
@@ -24,6 +29,11 @@ def getAllPersons():
         ids = [ob['id'] for ob in obj]
         return ids
 
+
+# Get ids from API
 ids = getAllPersons()
-[getDetailsPerson(id) for id in ids]
-#getDetailsPerson(160632)
+# Iterate into ids
+for id in ids:
+    data = getDetailsPerson(id)
+    filename = '%s.json' % id
+    s3_handler.upload_file(data, '06/api', filename)

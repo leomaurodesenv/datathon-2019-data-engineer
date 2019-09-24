@@ -21,6 +21,9 @@ python python/deputados_api.py
 python python/noticias_crawler.py
 ```
 
+3. Amazon S3 handler.
+-   `python/s3_handler.py`
+
 ---
 ## Also look ~
 

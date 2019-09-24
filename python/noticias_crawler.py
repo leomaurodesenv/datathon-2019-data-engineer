@@ -1,6 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+import s3_handler
 
 
 def getChildBy(tag, attr, value):
@@ -29,14 +30,17 @@ def getNews(url):
     response = requests.get(url)
     # success ?
     if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'lxml')
-        #print(response.text)
+        data = response.text
+        filename = url.split('/')[-2] if url.endswith('/') else url.split('/')[-1]
+        filename = '%s.html' % filename
+        s3_handler.upload_file(data, '06/html', filename)
 
 
 def iterateNoticias(page=1):
     links = getUltimasNoticias(page)
     if len(links) > 0:
         [getNews(link) for link in links]
+        # iterateNoticias(page+1) # limit iterator
 
-#links = getUltimasNoticias(1)
-getNews('https://www.camara.leg.br/noticias/588370-ciencia-e-tecnologia-debate-desenvolvimento-regional-sustentavel/')
+# Iterator
+iterateNoticias(page=1)
